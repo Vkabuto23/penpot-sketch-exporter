@@ -396,6 +396,37 @@ const backgroundShape = (shape: PenpotShape): PenpotShape => ({
   opacity: 1,
 });
 
+const hasVisiblePaint = (shape: PenpotShape) =>
+  (shape.fills?.length ?? 0) > 0 || (shape.strokes?.length ?? 0) > 0;
+
+const paintedDescendant = (
+  shape: PenpotShape,
+  shapes: Map<string, PenpotShape>,
+  visited = new Set<string>(),
+): PenpotShape | undefined => {
+  if (visited.has(shape.id)) return undefined;
+  visited.add(shape.id);
+  for (const childId of shape.shapes ?? []) {
+    const child = shapes.get(childId);
+    if (!child) continue;
+    if (hasVisiblePaint(child)) return child;
+    const nested = paintedDescendant(child, shapes, visited);
+    if (nested) return nested;
+  }
+  return undefined;
+};
+
+const booleanWithInheritedPaint = (shape: PenpotShape, shapes: Map<string, PenpotShape>) => {
+  if (hasVisiblePaint(shape)) return shape;
+  const donor = paintedDescendant(shape, shapes);
+  if (!donor) return shape;
+  return {
+    ...shape,
+    fills: donor.fills,
+    strokes: donor.strokes,
+  };
+};
+
 const convertShape = (
   shape: PenpotShape,
   shapes: Map<string, PenpotShape>,
@@ -405,7 +436,8 @@ const convertShape = (
   count: { value: number },
 ): Json[] => {
   count.value += 1;
-  if (shape.type === "path" || shape.type === "bool") return pathLayers(shape, parentBox, images);
+  if (shape.type === "path") return pathLayers(shape, parentBox, images);
+  if (shape.type === "bool") return pathLayers(booleanWithInheritedPaint(shape, shapes), parentBox, images);
   if (shape.type === "text") return [textLayer(shape, parentBox, images, fonts)];
   if (shape.type === "rect" || shape.type === "image" || shape.type === "circle") return [primitiveLayer(shape, parentBox, images)];
 
