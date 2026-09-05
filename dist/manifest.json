@@ -1,0 +1,7 @@
+{
+  "name": "Export to Figma (.sketch)",
+  "description": "Exports the current Penpot page as one editable Sketch file that can be dragged into Figma.",
+  "version": 2,
+  "code": "plugin.js",
+  "permissions": ["content:read", "allow:downloads"]
+}

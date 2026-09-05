@@ -1,0 +1,42 @@
+@import "@penpot/plugin-styles/styles.css";
+
+:root {
+  color-scheme: light dark;
+  font-family: Inter, Arial, sans-serif;
+  color: var(--db-primary);
+  background: var(--db-secondary);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--db-secondary); }
+button, input { font: inherit; }
+
+.app { min-height: 100vh; display: flex; flex-direction: column; padding: 24px; gap: 22px; }
+header { display: grid; gap: 8px; }
+.eyebrow { color: var(--accent-primary); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+h1, h2, p { margin: 0; }
+h1 { font-size: 24px; line-height: 1.15; }
+h2 { font-size: 14px; }
+header p { color: var(--df-secondary); font-size: 13px; line-height: 1.45; }
+
+.document-card { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--db-quaternary); border-radius: 10px; background: var(--db-tertiary); }
+.document-card div { display: grid; grid-template-columns: 75px 1fr; gap: 12px; align-items: baseline; }
+.document-card span, .section-heading span, footer small { color: var(--df-secondary); font-size: 11px; }
+.document-card strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+
+.selection { display: grid; gap: 10px; min-height: 130px; }
+.section-heading { display: flex; justify-content: space-between; align-items: baseline; }
+.roots { display: grid; gap: 7px; }
+.root-row { display: grid; grid-template-columns: 20px 1fr auto; gap: 10px; align-items: center; padding: 11px 12px; border: 1px solid var(--db-quaternary); border-radius: 8px; cursor: pointer; }
+.root-row:hover { border-color: var(--accent-primary); }
+.root-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+.root-size { color: var(--df-secondary); font-size: 11px; font-variant-numeric: tabular-nums; }
+
+footer { margin-top: auto; display: grid; gap: 10px; }
+progress { width: 100%; height: 5px; accent-color: var(--accent-primary); }
+.status { min-height: 18px; color: var(--df-secondary); font-size: 12px; }
+.status[data-kind="error"] { color: var(--status-error-500, #ff5c5c); }
+.status[data-kind="success"] { color: var(--status-success-500, #2fbf71); }
+button { width: 100%; min-height: 42px; border: 0; border-radius: 8px; color: var(--da-primary); background: var(--accent-primary); font-weight: 700; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+footer small { text-align: center; line-height: 1.35; }

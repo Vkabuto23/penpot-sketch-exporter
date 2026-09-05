@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Export to Figma</title>
+  </head>
+  <body>
+    <main class="app">
+      <header>
+        <span class="eyebrow">PENPOT → FIGMA</span>
+        <h1>Экспорт в один .sketch</h1>
+        <p>Figma откроет файл обычным перетаскиванием. Текст, векторы и изображения останутся отдельными слоями.</p>
+      </header>
+
+      <section class="document-card">
+        <div><span>Файл</span><strong id="file-name">Загрузка…</strong></div>
+        <div><span>Страница</span><strong id="page-name">—</strong></div>
+      </section>
+
+      <section class="selection">
+        <div class="section-heading">
+          <h2>Артборды</h2>
+          <span>выберите нужные</span>
+        </div>
+        <div id="roots" class="roots"></div>
+      </section>
+
+      <footer>
+        <progress id="progress" max="100" value="0" hidden></progress>
+        <p id="status" class="status">Готов к экспорту.</p>
+        <button id="export" type="button" disabled>Скачать один .sketch</button>
+        <small>Перетащите скачанный файл на главную страницу Figma.</small>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

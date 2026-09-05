@@ -1,0 +1,3 @@
+interface:
+  display_name: "Penpot Sketch Export"
+  short_description: "Deploy and verify Penpot-to-Sketch exports"

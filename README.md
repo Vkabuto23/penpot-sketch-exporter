@@ -1,0 +1,35 @@
+# Export to Figma (.sketch) — плагин Penpot
+
+Плагин экспортирует выбранные артборды текущей страницы Penpot в один редактируемый `.sketch`-файл. Такой файл можно перетащить мышкой на главную страницу Figma; отдельные артборды, текст, векторы и изображения импортируются как слои. Плагин Figma и платный тариф не нужны.
+
+## Запуск
+
+1. Плагин раздаётся встроенным frontend Penpot. Убедитесь, что `http://localhost:9001/plugins/penpot-sketch-exporter/manifest.json` открывается в браузере.
+2. В менеджере плагинов Penpot добавьте этот URL манифеста. Регистрация сохраняется только в текущем профиле браузера.
+3. В Penpot нажмите `Ctrl+Alt+P` и откройте `Export to Figma (.sketch)`.
+3. Отметьте нужные артборды и нажмите `Скачать один .sketch`.
+4. Перетащите скачанный `.sketch` на страницу Recent/Drafts в Figma.
+
+Исходники и production-сборка находятся в `D:\Program Files\Penpot\server\plugins\penpot-sketch-exporter`. Docker Compose монтирует `dist/` в frontend в режиме только для чтения, поэтому плагин не теряется при пересоздании контейнера. Если Penpot был переустановлен или профиль браузера сменился, добавьте URL манифеста заново через менеджер плагинов.
+
+## Установка в локальный Penpot
+
+1. Клонируйте этот репозиторий в `D:\Program Files\Penpot\server\plugins\penpot-sketch-exporter`.
+2. В сервис `penpot-frontend` файла `D:\Program Files\Penpot\server\docker-compose.yaml` добавьте read-only mount:
+
+   ```yaml
+   - ./plugins/penpot-sketch-exporter/dist:/var/www/app/plugins/penpot-sketch-exporter:ro
+   ```
+
+3. В каталоге плагина запустите `npm ci` и `npm run build`, затем пересоздайте только frontend: `docker compose --env-file ..\.env -p penpot -f ..\docker-compose.yaml up -d --force-recreate penpot-frontend`.
+4. Проверьте URL манифеста выше и добавьте его в менеджере плагинов Penpot.
+
+Не копируйте файлы в запущенный контейнер: bind mount сохраняет плагин при обновлении и пересоздании Docker-контейнеров.
+
+## Разработка
+
+- `npm run build` — проверка TypeScript и production-сборка.
+- `Start Penpot Figma Exporter.ps1` — проверяет типы, пересобирает плагин и публикует его через уже запущенный frontend Penpot.
+- Исходники находятся в `src/`, готовая сборка — в `dist/`.
+
+Изображения с кадрированием рендерятся средствами Penpot и встраиваются внутрь `.sketch`; текст и векторы конвертируются в нативные Sketch-слои. Маскированные логотипы встраиваются в удвоенном разрешении, чтобы Figma не теряла маску и не размывала знак.
