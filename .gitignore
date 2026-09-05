@@ -11,6 +11,9 @@ node_modules
 dist-ssr
 *.local
 
+# Local visual QA includes Figma import links and remains off the public repository.
+qa/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

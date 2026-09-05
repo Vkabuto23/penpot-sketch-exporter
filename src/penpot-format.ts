@@ -39,6 +39,7 @@ export type PenpotShape = {
   selrect?: { x?: number; y?: number; width?: number; height?: number };
   shapes?: string[];
   maskedGroup?: boolean;
+  clipContent?: boolean;
   fills?: PenpotFill[];
   strokes?: Array<{ strokeColor?: string; strokeOpacity?: number; strokeWidth?: number; strokeAlignment?: string; strokeStyle?: string }>;
   shadow?: Array<{ style?: string; offsetX?: number; offsetY?: number; blur?: number; spread?: number; hidden?: boolean; color?: string; opacity?: number }>;

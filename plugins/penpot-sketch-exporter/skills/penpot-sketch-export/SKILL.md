@@ -47,3 +47,5 @@ Before calling an export successful, check that the browser download completed a
 ## Export-fidelity changes
 
 Before changing the serializer, media transfer, or Sketch writer, read [the export architecture reference](references/export-architecture.md). Keep its transport and fidelity invariants unless the task specifically validates a replacement.
+
+After changing any conversion rule, run `npm test`, `npm run check`, and `npm run build`; then use an actual Figma import for the visually affected case.

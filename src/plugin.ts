@@ -14,7 +14,7 @@ if (!file || !page) {
   throw new Error("Откройте файл Penpot перед запуском плагина.");
 }
 
-penpot.ui.open("Export Sketch + SVG + PDF", `?theme=${penpot.theme}`, {
+penpot.ui.open("Export to Figma (.sketch)", `?theme=${penpot.theme}`, {
   width: 460,
   height: 650,
 });
@@ -110,6 +110,7 @@ const serializeShape = (shape: Shape, pendingMedia: PendingMedia[]): PenpotShape
     height: shape.height,
     selrect: { x: shape.x, y: shape.y, width: shape.width, height: shape.height },
     shapes: childrenOf(shape).map((child) => child.id),
+    clipContent: shape.type === "board" ? shape.clipContent : undefined,
     fills,
     strokes: (shape.strokes ?? []).map((stroke) => ({
       strokeColor: stroke.strokeColor,

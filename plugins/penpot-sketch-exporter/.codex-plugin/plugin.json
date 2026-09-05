@@ -1,6 +1,6 @@
 {
   "name": "penpot-sketch-exporter",
-  "version": "0.1.0+codex.20260905221344",
+  "version": "0.1.0+codex.20260905230409",
   "description": "Build, deploy, and troubleshoot the local Penpot-to-Sketch exporter.",
   "author": {
     "name": "Vkabuto23",

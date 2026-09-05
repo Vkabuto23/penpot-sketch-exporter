@@ -205,8 +205,8 @@ const ellipsePoints = (shape: PenpotShape) => {
   ];
   return raw.map((item) => ({
     ...curvePoint(box.x + item.x * box.width, box.y + item.y * box.height, box),
-    curveFrom: point(item.fx, item.fy),
-    curveTo: point(item.tx, item.ty),
+    curveFrom: point(item.tx, item.ty),
+    curveTo: point(item.fx, item.fy),
     hasCurveFrom: true,
     hasCurveTo: true,
     curveMode: 2,
@@ -236,29 +236,32 @@ const pathLayers = (shape: PenpotShape, parentBox: Bounds | undefined, images: M
     const endY = command.y ?? previous.y;
     const next = curvePoint(endX, endY, box);
     const prior = current.points[current.points.length - 1];
+    // In the Sketch file format, curveFrom leaves the current anchor and
+    // curveTo enters the next one. Reversing these creates loops/gaps in
+    // outlined strokes. See sketch-hq/sketch-reference-files/shape-paths.
     if (command.code === "C") {
-      prior.curveTo = point((command.x1 - box.x) / box.width, (command.y1 - box.y) / box.height);
-      prior.hasCurveTo = true;
+      prior.curveFrom = point((command.x1 - box.x) / box.width, (command.y1 - box.y) / box.height);
+      prior.hasCurveFrom = true;
       prior.curveMode = 4;
-      next.curveFrom = point((command.x2 - box.x) / box.width, (command.y2 - box.y) / box.height);
-      next.hasCurveFrom = true;
+      next.curveTo = point((command.x2 - box.x) / box.width, (command.y2 - box.y) / box.height);
+      next.hasCurveTo = true;
       next.curveMode = 4;
     } else if (command.code === "Q") {
       const c1x = previous.x + (2 / 3) * (command.x1 - previous.x);
       const c1y = previous.y + (2 / 3) * (command.y1 - previous.y);
       const c2x = endX + (2 / 3) * (command.x1 - endX);
       const c2y = endY + (2 / 3) * (command.y1 - endY);
-      prior.curveTo = point((c1x - box.x) / box.width, (c1y - box.y) / box.height);
-      prior.hasCurveTo = true;
+      prior.curveFrom = point((c1x - box.x) / box.width, (c1y - box.y) / box.height);
+      prior.hasCurveFrom = true;
       prior.curveMode = 4;
-      next.curveFrom = point((c2x - box.x) / box.width, (c2y - box.y) / box.height);
-      next.hasCurveFrom = true;
+      next.curveTo = point((c2x - box.x) / box.width, (c2y - box.y) / box.height);
+      next.hasCurveTo = true;
       next.curveMode = 4;
     }
     current.points.push(next);
     previous = { x: endX, y: endY };
   }
-  return subpaths.filter((item) => item.points.length > 1).map((item, index) => ({
+  const paths = subpaths.filter((item) => item.points.length > 1).map((item, index) => ({
     ...baseLayer({ ...shape, id: index === 0 ? shape.id : uuid(), name: index === 0 ? shape.name : `${shape.name} ${index + 1}` }, parentBox),
     _class: "shapePath",
     style: makeStyle(shape, images),
@@ -267,6 +270,29 @@ const pathLayers = (shape: PenpotShape, parentBox: Bounds | undefined, images: M
     pointRadiusBehaviour: 1,
     points: item.points,
   }));
+  if (paths.length <= 1) return paths;
+  // One SVG path can contain outer contours and holes. Independent filled
+  // layers would paint the holes solid (e.g. clocks/rings in pictograms).
+  // This is an actual compound vector, unlike an ordinary Penpot group.
+  return [{
+    ...baseLayer(shape, parentBox),
+    _class: "shapeGroup",
+    style: makeStyle(shape, images),
+    windingRule: 1,
+    hasClickThrough: false,
+    groupLayout: { _class: "MSImmutableFreeformGroupLayout" },
+    layers: paths.map((path, index) => ({
+      ...path,
+      do_objectID: uuid(),
+      name: `${shape.name} — Contour ${index + 1}`,
+      frame: { ...path.frame, x: 0, y: 0 },
+      rotation: 0,
+      isFlippedHorizontal: false,
+      isFlippedVertical: false,
+      isVisible: true,
+      style: makeStyle({ ...shape, opacity: 1, fills: [], strokes: [], shadow: [], blur: undefined }, images),
+    })),
+  }];
 };
 
 type TextRun = { text: string; style: PenpotTextNode };
@@ -454,14 +480,27 @@ const convertShape = (
     children[0].hasClippingMask = true;
     children[0].clippingMaskMode = 0;
   }
+  if (shape.type === "frame" && shape.clipContent) {
+    // Sketch groups have no frame clipping flag. An explicit mask preserves
+    // Penpot board crops without turning the children into a boolean shape.
+    const mask = primitiveLayer({
+      ...backgroundShape(shape),
+      name: `${shape.name} — Clip`,
+      fills: [{ fillColor: "#ffffff" }],
+    }, box, images);
+    mask.hasClippingMask = true;
+    mask.clippingMaskMode = 0;
+    children.unshift(mask);
+  }
   return [{
     ...baseLayer(shape, parentBox),
-    _class: "shapeGroup",
+    // shapeGroup is a compound vector, not an organisational container:
+    // Figma otherwise drops child paints and nested bitmaps on import.
+    _class: "group",
     style: makeStyle({ ...shape, fills: [], strokes: [], shadow: [], blur: undefined }, images),
     hasClickThrough: false,
     groupLayout: { _class: "MSImmutableFreeformGroupLayout" },
     layers: children,
-    windingRule: 1,
   }];
 };
 
