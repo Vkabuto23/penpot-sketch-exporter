@@ -1,6 +1,6 @@
 {
   "name": "penpot-sketch-exporter",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260905203935",
   "description": "Build, deploy, and troubleshoot the local Penpot-to-Sketch exporter.",
   "author": {
     "name": "Vkabuto23",
@@ -9,7 +9,12 @@
   "homepage": "https://github.com/Vkabuto23/penpot-sketch-exporter",
   "repository": "https://github.com/Vkabuto23/penpot-sketch-exporter",
   "license": "MIT",
-  "keywords": ["penpot", "sketch", "figma", "export"],
+  "keywords": [
+    "penpot",
+    "sketch",
+    "figma",
+    "export"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Penpot Sketch Exporter",
@@ -17,7 +22,10 @@
     "longDescription": "Provides a repeatable workflow for building, serving, installing, and diagnosing the Penpot-to-Sketch exporter.",
     "developerName": "Vkabuto23",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
     "defaultPrompt": [
       "Deploy the local Penpot Sketch exporter.",
       "Diagnose why Penpot cannot load the Sketch exporter.",

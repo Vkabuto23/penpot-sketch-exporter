@@ -43,3 +43,7 @@ Before calling an export successful, check that the browser download completed a
 3. Re-register the manifest in the current browser profile if Penpot reports the plugin missing; registration is profile-scoped.
 4. For export errors, reproduce with one simple board first, then add text, vectors, images, and masks to isolate the failing content.
 5. Preserve the source project and Docker volumes. Do not reset or rebuild the Penpot stack as a first response.
+
+## Export-fidelity changes
+
+Before changing the serializer, media transfer, or Sketch writer, read [the export architecture reference](references/export-architecture.md). Keep its transport and fidelity invariants unless the task specifically validates a replacement.
