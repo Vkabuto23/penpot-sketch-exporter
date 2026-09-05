@@ -32,7 +32,7 @@ If the `/plugins/` mount changes, recreate only `penpot-frontend` with the exist
 
 ## Install and export
 
-In a Penpot file, open the plugin manager and register the runtime manifest URL above. Open `Export to Figma (.sketch)` with the plugin command, select the required boards, then download one `.sketch` file. The output is intended to be dragged onto the Figma Recent or Drafts page; it does not require a Figma plugin.
+In a Penpot file, open the plugin manager and register the runtime manifest URL above. Open `Export Sketch + SVG + PDF` with the plugin command, select the required boards, then download the bundle. Drag its `.sketch` file onto the Figma Recent or Drafts page; it does not require a Figma plugin.
 
 Before calling an export successful, check that the browser download completed and open the resulting archive to confirm it contains `document.json`, `meta.json`, at least one `pages/*.json`, and any expected embedded images. Do not claim Figma import fidelity without opening it in Figma.
 

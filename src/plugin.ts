@@ -14,7 +14,7 @@ if (!file || !page) {
   throw new Error("Откройте файл Penpot перед запуском плагина.");
 }
 
-penpot.ui.open("Export to Figma (.sketch)", `?theme=${penpot.theme}`, {
+penpot.ui.open("Export Sketch + SVG + PDF", `?theme=${penpot.theme}`, {
   width: 460,
   height: 650,
 });
@@ -199,6 +199,38 @@ const sendChunkedMedia = async (id: string, shape: Shape, bytes: Uint8Array, ind
   penpot.ui.sendMessage({ source: "penpot", type: "status", message: `Встраиваю изображения: ${index}/${total}` });
 };
 
+const sendChunkedPreview = async (format: "svg" | "pdf", shape: Shape, bytes: Uint8Array, index: number, total: number) => {
+  const id = `${format}-${shape.id}`;
+  const chunkSize = 512 * 1024;
+  const totalChunks = Math.ceil(bytes.byteLength / chunkSize);
+  penpot.ui.sendMessage({
+    source: "penpot",
+    type: "preview-start",
+    id,
+    format,
+    name: shape.name,
+    x: shape.x,
+    y: shape.y,
+    width: shape.width,
+    height: shape.height,
+    totalChunks,
+    totalBytes: bytes.byteLength,
+  });
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex += 1) {
+    const start = chunkIndex * chunkSize;
+    penpot.ui.sendMessage({
+      source: "penpot",
+      type: "preview-chunk",
+      id,
+      index: chunkIndex,
+      bytes: bytes.slice(start, Math.min(bytes.byteLength, start + chunkSize)),
+    });
+    await new Promise((resolve) => setTimeout(resolve, 4));
+  }
+  penpot.ui.sendMessage({ source: "penpot", type: "preview-end", id });
+  penpot.ui.sendMessage({ source: "penpot", type: "status", message: `Готовлю SVG/PDF: ${index}/${total}` });
+};
+
 sendDocumentInfo();
 
 penpot.ui.onMessage<UiMessage>(async (message) => {
@@ -241,6 +273,7 @@ penpot.ui.onMessage<UiMessage>(async (message) => {
       rootIds: roots.map((shape) => shape.id),
       totalShapes: serialized.length,
       totalMedia: pendingMedia.length,
+      totalPreviews: roots.length * 2,
     });
     const batchSize = 100;
     for (let index = 0; index < serialized.length; index += batchSize) {
@@ -265,6 +298,14 @@ penpot.ui.onMessage<UiMessage>(async (message) => {
     }
     for (const [index, item] of renderedMedia.entries()) {
       await sendChunkedMedia(item.media.id, item.media.shape, item.bytes, index + 1, renderedMedia.length);
+    }
+    let previewIndex = 0;
+    for (const root of roots) {
+      for (const format of ["svg", "pdf"] as const) {
+        const bytes = await root.export({ type: format === "svg" ? "png" : "pdf", scale: 1, skipChildren: false });
+        previewIndex += 1;
+        await sendChunkedPreview(format, root, bytes, previewIndex, roots.length * 2);
+      }
     }
     penpot.ui.sendMessage({ source: "penpot", type: "graph-end" });
   } catch (error) {

@@ -287,7 +287,8 @@ const flattenText = (node: PenpotTextNode | string | undefined, inherited: Penpo
   return groups.flat();
 };
 const fontName = (run: PenpotTextNode) => {
-  const family = String(run.fontFamily || "Inter").replace(/\s+/g, "");
+  const sourceFamily = String(run.fontFamily || "Inter").replace(/\s+/g, "");
+  const family = sourceFamily.toLowerCase() === "manropelocal" ? "Manrope" : sourceFamily;
   const weight = num(run.fontWeight, 400);
   const italic = String(run.fontStyle).toLowerCase().includes("italic");
   const suffix = weight >= 800 ? "ExtraBold" : weight >= 700 ? "Bold" : weight >= 600 ? "SemiBold" : weight >= 500 ? "Medium" : weight <= 300 ? "Light" : "Regular";

@@ -1,6 +1,6 @@
 {
-  "name": "Export to Figma (.sketch)",
-  "description": "Exports the current Penpot page as one editable Sketch file that can be dragged into Figma.",
+  "name": "Export Sketch + SVG + PDF",
+  "description": "Exports selected Penpot boards as editable Sketch plus self-contained SVG and multipage PDF.",
   "version": 2,
   "code": "plugin.js",
   "permissions": ["content:read", "allow:downloads"]
